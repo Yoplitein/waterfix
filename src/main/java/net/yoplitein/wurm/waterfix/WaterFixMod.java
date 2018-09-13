@@ -125,11 +125,11 @@ public class WaterFixMod implements WurmServerMod, PreInitable
             case CodeIterator.ILOAD_0:
                 return 0;
             case CodeIterator.ILOAD_1:
-                return 0;
+                return 1;
             case CodeIterator.ILOAD_2:
-                return 0;
+                return 2;
             case CodeIterator.ILOAD_3:
-                return 0;
+                return 3;
             default:
                 throw new RuntimeException(String.format("Bytecode %02X is not a packed ILOAD", op));
         }
