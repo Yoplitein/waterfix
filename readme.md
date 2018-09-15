@@ -4,4 +4,4 @@ A Wurm Unlimited mod that allows building structures, plating trees, etc. at dir
 ## Building
 Requires [Maven](https://maven.apache.org/) and, obviously, a JDK.
 
-Run `mvn compile jar:jar assembly:single` to build the distribution zip.
+Run `mvn compile jar:jar assembly:single` to build the distribution zip. You can find it under the newly created `target/` directory.
