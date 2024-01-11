@@ -1,5 +1,5 @@
 # waterfix
-A Wurm Unlimited mod that allows building structures, plating trees, etc. at dirt level 0.
+A Wurm Unlimited mod that allows building structures, plating trees, hedges, etc. at dirt level 0. Also allows planting hedges on the north/east borders of tiles that are otherwise underwater.
 
 ## Building
 Requires [Maven](https://maven.apache.org/) and, obviously, a JDK.
