@@ -7,13 +7,11 @@ import java.util.stream.IntStream;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.CodeIterator;
-import javassist.bytecode.Descriptor;
 import javassist.bytecode.LocalVariableAttribute;
 import javassist.bytecode.MethodInfo;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
-import javassist.CtPrimitiveType;
 import javassist.NotFoundException;
 import org.gotti.wurmunlimited.modloader.classhooks.HookException;
 import org.gotti.wurmunlimited.modloader.classhooks.HookManager;
@@ -34,12 +32,7 @@ public class WaterFixMod implements WurmServerMod, PreInitable
         {
             ClassPool classPool = HookManager.getInstance().getClassPool();
             CtClass terraforming = classPool.get("com.wurmonline.server.behaviours.Terraforming");
-            CtClass[] paramTypes = {
-                CtPrimitiveType.intType,
-                CtPrimitiveType.intType,
-                CtPrimitiveType.booleanType
-            };
-            CtMethod method = terraforming.getMethod("isCornerUnderWater", Descriptor.ofMethod(CtPrimitiveType.booleanType, paramTypes));
+            CtMethod method = terraforming.getDeclaredMethod("isCornerUnderWater");
             MethodInfo methodInfo = method.getMethodInfo();
             CodeAttribute codeAttr = methodInfo.getCodeAttribute();
             CodeIterator codeIter = codeAttr.iterator();
@@ -55,20 +48,20 @@ public class WaterFixMod implements WurmServerMod, PreInitable
                 throw new HookException("Could not find height variable(s)");
 
             int repeat = 0;
-            boolean mark = false;
+            boolean foundHeightLocal = false;
 
             while(codeIter.hasNext())
             {
                 int index = codeIter.next();
                 int op = codeIter.byteAt(index);
 
-                if(mark)
+                if(foundHeightLocal)
                 {
                     if(op == CodeIterator.IFGT)
                     {
                         codeIter.writeByte(CodeIterator.IFGE, index);
 
-                        mark = false;
+                        foundHeightLocal = false;
                         repeat++;
 
                         if(repeat >= 2)
@@ -86,7 +79,7 @@ public class WaterFixMod implements WurmServerMod, PreInitable
                     int localIndex = isPacked ? iloadUnpackedValue(op) : codeIter.byteAt(index + 1);
 
                     if(heightIndices.stream().anyMatch(x -> x == localIndex))
-                        mark = true;
+                        foundHeightLocal = true;
                 }
             }
         }
