@@ -22,34 +22,12 @@ import org.gotti.wurmunlimited.modloader.interfaces.WurmServerMod;
 
 public class WaterFixMod implements WurmServerMod, PreInitable
 {
-    class Pair<KeyType, ValueType>
-    {
-        KeyType key;
-        ValueType value;
-        
-        public Pair(KeyType key, ValueType value)
-        {
-            this.key = key;
-            this.value = value;
-        }
-        
-        public KeyType getKey()
-        {
-            return this.key;
-        }
-        
-        public ValueType getValue()
-        {
-            return this.value;
-        }
-    }
-    
     @Override
     public void preInit()
     {
         fixUnderwaterCheck();
     }
-    
+
     private void fixUnderwaterCheck()
     {
         try
@@ -72,41 +50,41 @@ public class WaterFixMod implements WurmServerMod, PreInitable
                 .boxed()
                 .collect(Collectors.toList())
             ;
-            
+
             if(!heightIndices.stream().findFirst().isPresent())
                 throw new HookException("Could not find height variable(s)");
-            
+
             int repeat = 0;
             boolean mark = false;
-            
+
             while(codeIter.hasNext())
             {
                 int index = codeIter.next();
                 int op = codeIter.byteAt(index);
-                
+
                 if(mark)
                 {
                     if(op == CodeIterator.IFGT)
                     {
                         codeIter.writeByte(CodeIterator.IFGE, index);
-                        
+
                         mark = false;
                         repeat++;
-                        
+
                         if(repeat >= 2)
                             break;
                     }
-                    
+
                     continue;
                 }
-                
+
                 boolean isUnpacked = op == CodeIterator.ILOAD;
                 boolean isPacked = op >= CodeIterator.ILOAD_0 && op <= CodeIterator.ILOAD_3;
-                
+
                 if(isPacked || isUnpacked)
                 {
                     int localIndex = isPacked ? iloadUnpackedValue(op) : codeIter.byteAt(index + 1);
-                    
+
                     if(heightIndices.stream().anyMatch(x -> x == localIndex))
                         mark = true;
                 }
@@ -117,7 +95,7 @@ public class WaterFixMod implements WurmServerMod, PreInitable
             throw new HookException(err);
         }
     }
-    
+
     private int iloadUnpackedValue(int op)
     {
         switch(op)
